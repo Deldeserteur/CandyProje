@@ -419,6 +419,11 @@ namespace CandyProje
                     button.ForeColor = Color.White;
                     button.Image = Image.FromFile(@"C:\Users\damie\source\repos\CandyProje\CandyProje\Resources\ColumnJoker.png");
                     break;
+                case "Column":
+                    button.Text = "C";
+                    button.ForeColor = Color.White;
+                    button.Image = Image.FromFile(@"C:\Users\damie\source\repos\CandyProje\CandyProje\Resources\ColumnJoker.png");
+                    break;
                 case "ColorBomb":
                     button.Text = "CB";
                     button.ForeColor = Color.White;
