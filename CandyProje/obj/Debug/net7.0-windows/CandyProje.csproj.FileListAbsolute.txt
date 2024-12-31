@@ -3,7 +3,6 @@ C:\Users\damie\source\repos\CandyProje\CandyProje\bin\Debug\net7.0-windows\Candy
 C:\Users\damie\source\repos\CandyProje\CandyProje\bin\Debug\net7.0-windows\CandyProje.runtimeconfig.json
 C:\Users\damie\source\repos\CandyProje\CandyProje\bin\Debug\net7.0-windows\CandyProje.dll
 C:\Users\damie\source\repos\CandyProje\CandyProje\bin\Debug\net7.0-windows\CandyProje.pdb
-C:\Users\damie\source\repos\CandyProje\CandyProje\obj\Debug\net7.0-windows\CandyProje.Form1.resources
 C:\Users\damie\source\repos\CandyProje\CandyProje\obj\Debug\net7.0-windows\CandyProje.Properties.Resources.resources
 C:\Users\damie\source\repos\CandyProje\CandyProje\obj\Debug\net7.0-windows\CandyProje.csproj.GenerateResource.cache
 C:\Users\damie\source\repos\CandyProje\CandyProje\obj\Debug\net7.0-windows\CandyProje.GeneratedMSBuildEditorConfig.editorconfig
@@ -16,3 +15,4 @@ C:\Users\damie\source\repos\CandyProje\CandyProje\obj\Debug\net7.0-windows\Candy
 C:\Users\damie\source\repos\CandyProje\CandyProje\obj\Debug\net7.0-windows\CandyProje.genruntimeconfig.cache
 C:\Users\damie\source\repos\CandyProje\CandyProje\obj\Debug\net7.0-windows\ref\CandyProje.dll
 C:\Users\damie\source\repos\CandyProje\CandyProje\obj\Debug\net7.0-windows\CandyProje.sourcelink.json
+C:\Users\damie\source\repos\CandyProje\CandyProje\obj\Debug\net7.0-windows\CandyProje.PlayerScore.resources
