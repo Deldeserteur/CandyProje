@@ -51,7 +51,7 @@ namespace CandyProje
         private Form scoreForm;
         private readonly string scorePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-       "CandyGame",
+       "CandyProje",
        "highscores.txt"
         );
 
@@ -275,7 +275,7 @@ namespace CandyProje
                 // Make sure we're using the correct path
                 string scorePath = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                    "CandyGame",
+                    "CandyProje",
                     "highscores.txt"
                 );
 
@@ -345,7 +345,7 @@ namespace CandyProje
 
         private readonly string scorePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-        "CandyGame",
+        "CandyProje",
         "highscores.txt"
         );
 
