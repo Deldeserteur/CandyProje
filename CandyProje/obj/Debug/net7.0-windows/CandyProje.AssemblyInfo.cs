@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CandyProje")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+94a21f3806747e980559893d38dbdd49c291dfa6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+30fe8a863c262f4e4abdbac81f06caf367c9370c")]
 [assembly: System.Reflection.AssemblyProductAttribute("CandyProje")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CandyProje")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

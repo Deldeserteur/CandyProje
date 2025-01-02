@@ -1,3 +1,8 @@
+//Adý : ASSELEM DAMIEN
+//Soyadý : ADJALTE
+//Oðrenci Numara : B221200580
+//Proje adý : Match3 Game
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -57,7 +62,7 @@ namespace CandyProje
 
             // Enable keyboard input
             this.KeyPreview = true;
-            this.KeyDown += Form1_KeyDown;
+          
 
         }
 
@@ -167,6 +172,16 @@ namespace CandyProje
             this.Controls.Add(gameBoard.PlayerNameLabel);
             CenterGameBoard();
 
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.P && gameBoard != null && gameBoard.Visible)
+            {
+                gameBoard.TogglePause();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         private void CenterGameBoard()
@@ -325,7 +340,9 @@ namespace CandyProje
         private Label scoreLabel;
         private Label playerNameLabel;
         private List<PlayerScore> highScores;
-       
+        private Point? selectedPosition = null; // fields for keyboard selection
+        private Point? targetPosition = null;
+
         private readonly string scorePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
         "CandyGame",
@@ -346,6 +363,7 @@ namespace CandyProje
         // Property to check pause state
         public bool IsPaused => isPaused;
 
+        //contructor
         public GameBoard(int rows, int cols, string playerName )
         {
             if (string.IsNullOrWhiteSpace(playerName))
@@ -388,25 +406,67 @@ namespace CandyProje
 
                     this.buttons[row, col] = button;
                     this.Controls.Add(button);
-                }
+
+                }  
             }
 
-            //delete auto match
-            //DetectAndRemoveInitialMatches();
+            if (Parent is Form form)
+            {
+                form.KeyPreview = true;
+                form.KeyDown += (s, e) =>
+                {
+                    if (e.KeyCode == Keys.P)
+                    {
+                        TogglePause();
+                        e.Handled = true;
+                    }
+                };
+            }
+
+            ////handling to enable keyboard input
+            this.Focus();
+            this.Select();
         }
 
-        private void GameBoard_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        protected override void OnParentChanged(EventArgs e)
         {
+            base.OnParentChanged(e);
+            if (Parent is Form form)
+            {
+                form.KeyPreview = true;
+                form.KeyDown += Parent_KeyDown;
+                form.KeyDown += HandleKeyDown;
+
+            }
+        }
+
+        private void Parent_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Pause handling
             if (e.KeyCode == Keys.P)
             {
-                if (isPaused)
-                {
-                    ResumeGame();
-                }
-                else
-                {
-                    PauseGame();
-                }
+                TogglePause();
+                e.Handled = true;
+                return;
+            }
+
+            if (isPaused || gameOver) return;
+
+            // Movement handling
+            switch (e.KeyCode)
+            {
+                case Keys.Left:
+                case Keys.Right:
+                case Keys.Up:
+                case Keys.Down:
+                    HandleArrowKey(e.KeyCode);
+                    e.Handled = true;
+                    break;
+                case Keys.Enter:
+                case Keys.Space:
+                    HandleSelectionKey();
+                    e.Handled = true;
+                    break;
             }
         }
 
@@ -427,10 +487,26 @@ namespace CandyProje
                         BackColor = Color.FromArgb(128, 0, 0, 0), // Semi-transparent black
                         Visible = false
                     };
-                    this.Controls.Add(pauseOverlay);
-                }
 
-                pauseOverlay.Visible = true;
+                    // Add "PAUSED" text
+                    Label pausedLabel = new Label
+                    {
+                        Text = "PAUSED",
+                        Font = new Font("Arial", 24, FontStyle.Bold),
+                        ForeColor = Color.White,
+                        AutoSize = true
+                    };
+                    pauseOverlay.Controls.Add(pausedLabel);
+                    pausedLabel.Location = new Point(
+                        (pauseOverlay.Width - pausedLabel.Width) / 2,
+                        (pauseOverlay.Height - pausedLabel.Height) / 2
+                    );
+
+                    this.Controls.Add(pauseOverlay);
+                } 
+            
+
+             pauseOverlay.Visible = true;
                 pauseOverlay.BringToFront();
 
                 // Disable all candy buttons
@@ -1218,6 +1294,209 @@ namespace CandyProje
 
             return scores;
         
+        }
+
+        private void GameBoard_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.P)
+            {
+                if (isPaused)
+                {
+                    ResumeGame();
+                }
+                else
+                {
+                    PauseGame();
+                }
+            }
+
+            if (isPaused || gameOver) return;
+
+            switch (e.KeyCode)
+            {
+                case Keys.Left:
+                case Keys.Right:
+                case Keys.Up:
+                case Keys.Down:
+                    HandleArrowKey(e.KeyCode);
+                    e.IsInputKey = true;
+                    break;
+                case Keys.Enter:
+                case Keys.Space:
+                    HandleSelectionKey();
+                    break;
+            }
+        }
+
+        private void HandleKeyDown(object sender, KeyEventArgs e)
+        {
+            if (isPaused || gameOver) return;
+
+            switch (e.KeyCode)
+            {
+                case Keys.A:
+                case Keys.D:
+                case Keys.W:
+                case Keys.S:
+                    HandleWASDKey(e.KeyCode);
+                    e.Handled = true;
+                    break;
+                case Keys.Enter:
+                case Keys.Space:
+                    HandleSelectionKey();
+                    e.Handled = true;
+                    break;
+            }
+        }
+
+        private void HandleWASDKey(Keys key)
+        {
+            if (!selectedPosition.HasValue)
+            {
+                selectedPosition = new Point(rows / 2, cols / 2);
+                HighlightSelectedButton();
+                return;
+            }
+
+            Point newPos = selectedPosition.Value;
+            switch (key)
+            {
+                case Keys.A:  // Left
+                    if (newPos.Y > 0) newPos.Y--;
+                    break;
+                case Keys.D:  // Right
+                    if (newPos.Y < cols - 1) newPos.Y++;
+                    break;
+                case Keys.W:  // Up
+                    if (newPos.X > 0) newPos.X--;
+                    break;
+                case Keys.S:  // Down
+                    if (newPos.X < rows - 1) newPos.X++;
+                    break;
+            }
+
+            if (!targetPosition.HasValue)
+            {
+                ClearHighlight();
+                selectedPosition = newPos;
+                HighlightSelectedButton();
+            }
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            if (Parent is Form form)
+            {
+                form.KeyPreview = true;
+                form.KeyDown += HandleKeyDown;
+            }
+        }
+
+        protected override void OnHandleDestroyed(EventArgs e)
+        {
+            if (Parent is Form form)
+            {
+                form.KeyDown -= HandleKeyDown;
+            }
+            base.OnHandleDestroyed(e);
+        }
+
+        private void HandleArrowKey(Keys key)
+        {
+            if (!selectedPosition.HasValue)
+            {
+                selectedPosition = new Point(rows / 2, cols / 2);
+                HighlightSelectedButton();
+                return;
+            }
+
+            Point newPos = selectedPosition.Value;
+            switch (key)
+            {
+                case Keys.Left:
+                    if (newPos.Y > 0) newPos.Y--;
+                    break;
+                case Keys.Right:
+                    if (newPos.Y < cols - 1) newPos.Y++;
+                    break;
+                case Keys.Up:
+                    if (newPos.X > 0) newPos.X--;
+                    break;
+                case Keys.Down:
+                    if (newPos.X < rows - 1) newPos.X++;
+                    break;
+            }
+
+            if (!targetPosition.HasValue)
+            {
+                ClearHighlight();
+                selectedPosition = newPos;
+                HighlightSelectedButton();
+            }
+        }
+
+        private void HandleSelectionKey()
+        {
+            if (!selectedPosition.HasValue) return;
+
+            if (!targetPosition.HasValue)
+            {
+                targetPosition = selectedPosition;
+                buttons[selectedPosition.Value.X, selectedPosition.Value.Y].FlatAppearance.BorderColor = Color.Yellow;
+            }
+            else
+            {
+                Point pos1 = targetPosition.Value;
+                Point pos2 = selectedPosition.Value;
+
+                if (AreAdjacent(pos1, pos2))
+                {
+                    Button button1 = buttons[pos1.X, pos1.Y];
+                    Button button2 = buttons[pos2.X, pos2.Y];
+
+                    SwapButtons(button1, button2);
+
+                    if (GetMatchLength(pos1.X, pos1.Y, true) >= 3 ||
+                        GetMatchLength(pos1.X, pos1.Y, false) >= 3 ||
+                        GetMatchLength(pos2.X, pos2.Y, true) >= 3 ||
+                        GetMatchLength(pos2.X, pos2.Y, false) >= 3)
+                    {
+                        RemoveMatches();
+                    }
+                    else
+                    {
+                        SwapButtons(button1, button2);
+                    }
+                }
+
+                ClearHighlight();
+                selectedPosition = null;
+                targetPosition = null;
+            }
+        }
+
+        private bool AreAdjacent(Point p1, Point p2)
+        {
+            return (Math.Abs(p1.X - p2.X) == 1 && p1.Y == p2.Y) ||
+                   (Math.Abs(p1.Y - p2.Y) == 1 && p1.X == p2.X);
+        }
+
+        private void HighlightSelectedButton()
+        {
+            if (selectedPosition.HasValue)
+            {
+                buttons[selectedPosition.Value.X, selectedPosition.Value.Y].FlatAppearance.BorderColor = Color.White;
+                buttons[selectedPosition.Value.X, selectedPosition.Value.Y].FlatAppearance.BorderSize = 2;
+            }
+        }
+
+        private void ClearHighlight()
+        {
+            if (selectedPosition.HasValue)
+            {
+                buttons[selectedPosition.Value.X, selectedPosition.Value.Y].FlatAppearance.BorderSize = 0;
+            }
         }
 
         private void MakePiecesFall()
